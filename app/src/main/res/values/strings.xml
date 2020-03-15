@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">TextEditor</string>
+    <string name="action_open">open</string>
+    <string name="action_settings">setting</string>
+    <string name="action_gotoline">gotoline</string>
+    
+</resources>
