@@ -1,16 +1,18 @@
 package com.app.ui;
 
+import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.ContentResolver;
-import android.graphics.Rect;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewTreeObserver;
+import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import com.app.ui.R;
 import com.idea.editor.TextEditor;
 import java.io.BufferedReader;
@@ -18,17 +20,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import androidx.appcompat.widget.Toolbar;
 
 public class MainActivity extends AppCompatActivity {
 
-
     private TextEditor mEditor;
-    private TextLoadTask mLoadTask;
-    private ProgressDialog mProgressDialog;
-    private ContentResolver mContentResolver;
-
-
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -38,25 +34,34 @@ public class MainActivity extends AppCompatActivity {
         toolbar.setTitle(R.string.app_name);
         setSupportActionBar(toolbar);
         
-        
-        mContentResolver = getContentResolver();
-        mLoadTask = new TextLoadTask();
 
         mEditor = findViewById(R.id.mTextEditor);
         mEditor.setText("TextEditor");
         mEditor.requestFocus();
-
+        
+        String permission = Manifest.permission.WRITE_EXTERNAL_STORAGE;
+        if(!hasPermission(permission)) {
+            requestPermission(permission);
+        }
     }
     
   
     
-    View.OnClickListener clickListener = new View.OnClickListener(){
+    public boolean hasPermission(String permission){
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+            return checkSelfPermission(permission) == PackageManager.PERMISSION_GRANTED;
+        else
+            return true;
+    }
 
-        @Override
-        public void onClick(View v) {
-            
+    public void requestPermission(String permission){
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+            if(shouldShowRequestPermissionRationale(permission)){
+                Toast.makeText(this, "request read sdcard permmission", Toast.LENGTH_SHORT).show();
+            }
+            requestPermissions(new String[]{permission},0);
         }
-    };
+    }
     
     
     @Override
@@ -77,7 +82,7 @@ public class MainActivity extends AppCompatActivity {
                 mEditor.redo();
                 break;
             case R.id.action_open:
-                mLoadTask.execute("/sdcard/Download/output.txt");
+                mEditor.setText(openFile("/sdcard/Download/View.java"));
                 break;
             case R.id.action_gotoline:
 				mEditor.gotoLine(3000000);
@@ -90,63 +95,22 @@ public class MainActivity extends AppCompatActivity {
     }
 
     
-    
-    
-    
-    
-    class TextLoadTask extends AsyncTask<String, Integer, StringBuffer> {
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            mProgressDialog = new ProgressDialog(MainActivity.this);
-            mProgressDialog.setMessage("loading...");
-            mProgressDialog.setIndeterminate(true);
-            mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-            mProgressDialog.setCancelable(false);
-            mProgressDialog.show();
-        }
-
-
-        @Override
-        protected StringBuffer doInBackground(String... params) {
-
-            String uri = params[0];
-            StringBuffer buf = new StringBuffer();
-            InputStream in = null;
-            BufferedReader br = null;
-
-            try {
-                if (uri.startsWith("content://")) 
-                    in = mContentResolver.openInputStream(Uri.parse(uri));
-                else 
-                    in = new FileInputStream(new File(uri));
-                String text = null;
-                br = new BufferedReader(new InputStreamReader(in, "utf-8"));
-                while ((text = br.readLine()) != null) {                   
-                    buf.append(text).append("\n"); 
-                }
-                in.close();
-                br.close();
-
-            } catch (Exception e) {
-                e.printStackTrace();
+    public String openFile(String pathname) {
+        InputStream in = null;
+        BufferedReader br = null;
+        String text = null;
+        StringBuffer buf = new StringBuffer();
+        try {
+            in = new FileInputStream(new File(pathname));
+            br = new BufferedReader(new InputStreamReader(in));
+            while((text = br.readLine()) != null) {
+                buf.append(text + "\n");
             }
-            return buf;            
+            in.close();
+            br.close();
+        } catch(Exception e) {
+            e.printStackTrace();
         }
-
-        @Override
-        protected void onProgressUpdate(Integer...values) {
-            super.onProgressUpdate(values);
-            //mProgressDialog.setProgress(values[0]);
-            //mProgressDialog.setMessage("loading..." + String.valueOf(values[0]));
-        }
-
-        
-        @Override
-        protected void onPostExecute(StringBuffer result) {
-            mProgressDialog.dismiss();
-            mEditor.setText(result);
-        }
+        return buf.toString();
     }
 }
