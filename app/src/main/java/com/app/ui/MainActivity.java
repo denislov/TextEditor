@@ -81,7 +81,7 @@ public class MainActivity extends AppCompatActivity {
                 mEditor.setText(openFile("/sdcard/Download/View.java"));
                 break;
             case R.id.action_gotoline:
-				mEditor.gotoLine(3000000);
+		mEditor.gotoLine(3000000);
                 break;
             case R.id.action_settings:
                 break;
