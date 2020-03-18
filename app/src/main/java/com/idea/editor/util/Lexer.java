@@ -58,24 +58,24 @@ public class Lexer {
     public final static int SINGLE_SYMBOL_DELIMITED_A = 50;
     public final static int SINGLE_SYMBOL_DELIMITED_B = 51;
     public final static int MAX_KEYWORD_LENGTH = 127;
-    private static Language _globalLanguage = LanguageNonProg.getInstance();
-    LexCallback _callback = null;
-    private DocumentProvider _hDoc;
-    private LexThread _workerThread = null;
+    private static Language mGlobalLanguage = LanguageNonProg.getInstance();
+    LexCallback mCallback = null;
+    private DocumentProvider hDoc;
+    private LexThread mWorkerThread = null;
     public Lexer(LexCallback callback) {
-        _callback = callback;
+        mCallback = callback;
     }
 
     synchronized public static Language getLanguage() {
-        return _globalLanguage;
+        return mGlobalLanguage;
     }
 
     synchronized public static void setLanguage(Language lang) {
-        _globalLanguage = lang;
+        mGlobalLanguage = lang;
     }
 	
 	 public static DefFormatter getFormatter() {
-        return _globalLanguage.getFormatter();
+        return mGlobalLanguage.getFormatter();
     }
 
     public static ArrayList<Rect> mLines = new ArrayList<>();
@@ -84,34 +84,34 @@ public class Lexer {
     public void tokenize(DocumentProvider hDoc) {
         //tokenize will modify the state of hDoc; make a copy
         setDocument(new DocumentProvider(hDoc));
-        if (_workerThread == null) {
-            _workerThread = new LexThread(this);
-            _workerThread.start();
+        if (mWorkerThread == null) {
+            mWorkerThread = new LexThread(this);
+            mWorkerThread.start();
         } else {
-            _workerThread.restart();
+            mWorkerThread.restart();
         }
     }
 
     void tokenizeDone(List<Pair> result) {
-        if (_callback != null) {
-            _callback.lexDone(result);
+        if (mCallback != null) {
+            mCallback.lexDone(result);
         }
-        _workerThread = null;
+        mWorkerThread = null;
     }
 
     public void cancelTokenize() {
-        if (_workerThread != null) {
-            _workerThread.abort();
-            _workerThread = null;
+        if (mWorkerThread != null) {
+            mWorkerThread.abort();
+            mWorkerThread = null;
         }
     }
 
     public synchronized DocumentProvider getDocument() {
-        return _hDoc;
+        return hDoc;
     }
 
     public synchronized void setDocument(DocumentProvider hDoc) {
-        _hDoc = hDoc;
+        this.hDoc = hDoc;
     }
 
     public interface LexCallback {
@@ -137,14 +137,13 @@ public class Lexer {
             _abort = new Flag();
         }
 
-        @Override
+        //@Override
         public void run() {
             do {
                 rescan = false;
                 _abort.clear();
 				_tokens = Lexer.getLanguage().getTokenizer().tokenize(getDocument(), _abort);
-				}
-            while (rescan);
+			} while (rescan);
 
             if (!_abort.isSet()) {
                 // lex complete

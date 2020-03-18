@@ -35,14 +35,16 @@ public class MainActivity extends AppCompatActivity {
         mEditor.setText("TextEditor");
         mEditor.requestFocus();
         
-        String permission = Manifest.permission.WRITE_EXTERNAL_STORAGE;
-        if(!hasPermission(permission)) {
-            requestPermission(permission);
+        String[] permission = new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE};
+        
+        for(String perm:permission) {
+            if(!hasPermission(perm)) {
+                applyPermission(perm);      
+            }
         }
     }
     
   
-    
     public boolean hasPermission(String permission){
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
             return checkSelfPermission(permission) == PackageManager.PERMISSION_GRANTED;
@@ -50,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
             return true;
     }
 
-    public void requestPermission(String permission){
+    public void applyPermission(String permission){
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
             if(shouldShowRequestPermissionRationale(permission)){
                 Toast.makeText(this, "request read sdcard permmission", Toast.LENGTH_SHORT).show();
@@ -78,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
                 mEditor.redo();
                 break;
             case R.id.action_open:
-                mEditor.setText(openFile("/sdcard/Download/View.java"));
+                mEditor.setText(openFile("/sdcard/Download/textview.java"));
                 break;
             case R.id.action_gotoline:
 				mEditor.gotoLine(3000000);

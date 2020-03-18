@@ -900,12 +900,13 @@ public abstract class FreeScrollingTextField extends View implements Document.Te
 //        }
 
         if (isShowRegion && !isWordWrap()) {
-//            int o = mTextPaint.getColor();
+//            int originColor = mTextPaint.getColor();
 //            mTextPaint.setColor(mColorScheme.getColor(ColorScheme.Colorable.LINE_HIGHLIGHT));
-            doBlockLine(canvas);
-//            mTextPaint.setColor(o);
+              doBlockLine(canvas);
+//            mTextPaint.setColor(originColor);
         }
     }
+    
     private void doBlockLine(Canvas canvas) {
         ArrayList<Rect> lines = Lexer.mLines;
         if (lines == null || lines.isEmpty())
@@ -914,16 +915,16 @@ public abstract class FreeScrollingTextField extends View implements Document.Te
         int bt = bounds.top;
         int bb = bounds.bottom;
         for (Rect rect : lines) {
-            /*if(rect.top==mCaretRow){
-                doBlockRow(canvas,rect.bottom);
-            }else if(rect.bottom==mCaretRow){
-                doBlockRow(canvas,rect.top);
-            }*/
-            int top = (rect.top+1) * rowHeight();
+//            if(rect.top == mCaretRow){
+//                doBlockRow(canvas, rect.bottom);
+//            } else if(rect.bottom == mCaretRow){
+//                doBlockRow(canvas, rect.top);
+//            }
+            int top = (rect.top + 1) * rowHeight();
             int bottom = rect.bottom * rowHeight();
             if (bottom < bt || top > bb)
                 continue;
-            int left = Math.min(getCharExtent(rect.left).first, getCharExtent(rect.right).first);
+            int left = Math.min(getCharExtent(rect.left).first, getCharExtent(rect.right).first) + mCursorWidth;
             canvas.drawLine(left, top, left, bottom, mLineNumPaint);
         }
     }
@@ -1278,7 +1279,7 @@ public abstract class FreeScrollingTextField extends View implements Document.Te
             if (charRight + SCROLL_EDGE_SLOP / 3 >= (getScrollX() + getContentWidth())) {
                 scrollBy = charRight + SCROLL_EDGE_SLOP / 3 - getScrollX() - getContentWidth();
                 
-            } else if (charLeft - SCROLL_EDGE_SLOP / 3 < getScrollX() + mAlphaWidth) {
+            } else if (charLeft - SCROLL_EDGE_SLOP / 3 <= getScrollX() + mAlphaWidth) {
                 scrollBy = charLeft - SCROLL_EDGE_SLOP / 3 - getScrollX() - mAlphaWidth;
                 if(charLeft <= mLeftOffset)
                     scrollBy = 0;

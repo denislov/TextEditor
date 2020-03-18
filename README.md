@@ -11,3 +11,6 @@ Screenshot02.jpg
 ![image](https://raw.githubusercontent.com/Lzhiyong/TextEditor/master/screenshot/Screenshot02.jpg)
 
 
+Screenshot03.jpg
+![image](https://raw.githubusercontent.com/Lzhiyong/TextEditor/master/screenshot/Screenshot03.jpg)
+
