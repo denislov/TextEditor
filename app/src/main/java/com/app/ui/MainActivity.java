@@ -80,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
                 mEditor.redo();
                 break;
             case R.id.action_open:
-                mEditor.setText(openFile("/sdcard/Download/textview.java"));
+                mEditor.setText(openFile("/sdcard/Download/output.txt"));
                 break;
             case R.id.action_gotoline:
 		mEditor.gotoLine(3000000);
