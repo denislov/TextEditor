@@ -124,6 +124,7 @@ public class YoyoNavigationMethod extends TouchNavigationMethod
 		}
 	}
 
+    // move yoyo
 	private void moveHandle(Yoyo yoyo, MotionEvent e) {
         boolean scrolled = false;
         int x = (int) e.getX() - mTextField.getPaddingLeft();
@@ -131,13 +132,13 @@ public class YoyoNavigationMethod extends TouchNavigationMethod
         
         // If the edges of the textField content area are touched, scroll in the
         // corresponding direction.
-        if (x < mTextField.SCROLL_EDGE_SLOP / 3) {
+        if (x <= mTextField.SCROLL_EDGE_SLOP / 3) {
             scrolled = mTextField.autoScrollCaret(FreeScrollingTextField.SCROLL_LEFT);
         } else if (x >= (mTextField.getContentWidth() - mTextField.SCROLL_EDGE_SLOP / 3)) {
             scrolled = mTextField.autoScrollCaret(FreeScrollingTextField.SCROLL_RIGHT);
         } else if (y < mTextField.SCROLL_EDGE_SLOP) {
             scrolled = mTextField.autoScrollCaret(FreeScrollingTextField.SCROLL_UP);
-        } else if (y >= (mTextField.getContentHeight() - mTextField.SCROLL_EDGE_SLOP)) {
+        } else if (y > (mTextField.getContentHeight() - mTextField.SCROLL_EDGE_SLOP)) {
             scrolled = mTextField.autoScrollCaret(FreeScrollingTextField.SCROLL_DOWN);
         }
        
@@ -201,13 +202,14 @@ public class YoyoNavigationMethod extends TouchNavigationMethod
         
         int x = (int) e.getX() + mTextField.getScrollX();
 		int y = (int) e.getY() + mTextField.getScrollY();
+        
         mTextField.stopBlink();
         mTextField.setCursorVisiable(false);
         yoyoRemoveCallback();
         
         // 如果之前有选择文本，则再次双击或者长按选择文本的区域，直接返回
         // 反之则会导致水滴错位
-        if(mTextField.isSelectText()){
+        if(mTextField.isSelectText()) {
             int strictCharOffset = mTextField.coordToCharIndexStrict(x, y);
             if (mTextField.inSelectionRange(strictCharOffset) ||
                 isNearChar(x, y, mTextField.getSelectionStart()) ||

@@ -2115,7 +2115,10 @@ public abstract class FreeScrollingTextField extends View implements Document.Te
             invalidateSelectionRows();
             mFieldController.setSelectText(false);
         }
-
+        // remove cursor blink callback
+        stopBlink();
+        // restart blink 
+        startBlink();
         switch (keyCode) {
             case KeyEvent.KEYCODE_DPAD_RIGHT:
                 mFieldController.moveCaretRight(false);
